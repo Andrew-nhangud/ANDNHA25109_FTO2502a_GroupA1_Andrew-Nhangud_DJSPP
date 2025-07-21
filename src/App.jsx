@@ -1,3 +1,4 @@
+// src/App.jsx
 import React, { useState, useEffect } from 'react';
 import { Route, Routes, useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -8,19 +9,11 @@ import PodcastCard from './components/PodcastCard';
 import PodcastModal from './components/PodcastModal';
 import FullScreenModal from './components/FullScreenModal';
 import Pagination from './components/Pagination';
+import AudioPlayer from './components/AudioPlayer'; // Import the AudioPlayer component
 import { genres } from './data/data';
 import { formatDate } from './utils/utils';
 import { usePodcastContext } from './PodcastContext';
 
-/**
- * Main App component that fetches and displays podcasts.
- * 
- * This component manages the state for podcasts, loading status, error messages,
- * and the currently selected podcast. It also handles filtering and pagination
- * of the podcast list.
- * 
- * @returns {JSX.Element} The rendered App component.
- */
 const App = () => {
   // State variables
   const [podcasts, setPodcasts] = useState([]); // All podcasts
@@ -31,6 +24,10 @@ const App = () => {
   const [isLoading, setIsLoading] = useState(true); // Loading state
   const [error, setError] = useState(null); // Error state
   const [noResultsMessage, setNoResultsMessage] = useState(''); // Message for no results
+  const [audioSrc, setAudioSrc] = useState('https://podcast-api.netlify.app/placeholder-audio.mp3'); // State for audio source
+  const [isPlaying, setIsPlaying] = useState(false); // State for audio playback
+  const [currentTime, setCurrentTime] = useState(0); // State for current playback time
+  const [duration, setDuration] = useState(0); // State for audio duration
 
   // Context values for search, genre, sort, pagination
   const {
@@ -142,6 +139,38 @@ const App = () => {
   // Function to handle pagination
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
+  // Function to handle play/pause
+  const handlePlayPause = () => {
+    setIsPlaying(!isPlaying);
+  };
+
+  // Function to handle time update
+  const handleTimeUpdate = (time) => {
+    setCurrentTime(time);
+  };
+
+  // Function to handle duration change
+  const handleDurationChange = (duration) => {
+    setDuration(duration);
+  };
+
+  // Effect to handle confirmation prompt on page unload
+  useEffect(() => {
+    const handleBeforeUnload = (event) => {
+      if (isPlaying) {
+        const confirmationMessage = "You have audio playing. Are you sure you want to leave?";
+        event.returnValue = confirmationMessage; // Standard way to show confirmation dialog
+        return confirmationMessage; // For some browsers
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [isPlaying]);
+
   return (
     <div>
       <Header />
@@ -202,9 +231,26 @@ const App = () => {
           setIsFullScreenModalOpen(false);
           navigate('/'); // Navigate back to the landing page
         }} 
+        audioSrc={audioSrc} // Pass the audio source here
+        isPlaying={isPlaying}
+        currentTime={currentTime}
+        duration={duration}
+        onPlayPause={handlePlayPause}
+        onTimeUpdate={handleTimeUpdate}
+        onDurationChange={handleDurationChange}
+      />
+      {/* Render the AudioPlayer component in the main view */}
+      <AudioPlayer 
+        audioSrc={audioSrc} 
+        isPlaying={isPlaying}
+        onPlayPause={handlePlayPause}
+        onTimeUpdate={handleTimeUpdate}
+        onDurationChange={handleDurationChange}
+        currentTime={currentTime} // Pass current time to AudioPlayer
       />
     </div>
   );
 };
 
 export default App;
+
