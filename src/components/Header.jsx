@@ -1,15 +1,8 @@
-/**
- * Header component for the application.
- * 
- * This component displays the application title and icons for navigation.
- * It includes a logo and a profile picture icon.
- * 
- * @component
- * @returns {JSX.Element} The rendered Header component.
- */
 import React from 'react';
+import { Link } from 'react-router-dom';
 import headphonesIcon from '../assets/images/headphones-icon.png';
 import profilePictureIcon from '../assets/images/profile-picture-icon.png';
+import heartFilled from '../assets/images/heart-filled.png';
 import '../styles/styles.css';
 
 const Header = () => {
@@ -17,11 +10,16 @@ const Header = () => {
     <header className="header-container">
       <div className="innerHeader-container container">
         <div className="rightSide-icons">
-          <img src={headphonesIcon} alt="headphones picture" />
-          <h1>Podcast<span>Hub</span></h1>
+          <img src={headphonesIcon} alt="headphones icon" />
+          <Link to="/" className="logo-link">
+            <h1>Podcast<span>Hub</span></h1>
+          </Link>
         </div>
         <div className="leftSide-icons">
-          <img src={profilePictureIcon} alt="profile picture" />
+          <Link to="/favorites" className="favorites-link">
+            <img src={heartFilled} alt="Favorites" />
+          </Link>
+          <img src={profilePictureIcon} alt="profile" className="profile-icon" />
         </div>
       </div>
     </header>
