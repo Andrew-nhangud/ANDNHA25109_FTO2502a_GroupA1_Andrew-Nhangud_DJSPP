@@ -1,8 +1,10 @@
-// src/components/FullScreenModal.jsx
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
+import { usePodcastContext } from '../PodcastContext';
 import axios from 'axios';
-import AudioPlayer from './AudioPlayer'; // Import the AudioPlayer component
+import AudioPlayer from './AudioPlayer';
+import heartOutline from '../assets/images/heart-outline.png';
+import heartFilled from '../assets/images/heart-filled.png';
 
 /**
  * FullScreenModal component for displaying podcast details in full screen.
@@ -24,10 +26,11 @@ import AudioPlayer from './AudioPlayer'; // Import the AudioPlayer component
  * @returns {JSX.Element|null} The rendered FullScreenModal component or null if closed.
  */
 const FullScreenModal = ({ podcast, isOpen, onClose, audioSrc, isPlaying, currentTime, duration, onPlayPause, onTimeUpdate, onDurationChange }) => {
+  const { favorites, toggleFavorite } = usePodcastContext();
+  const [seasonsData, setSeasonsData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [expandedSeason, setExpandedSeason] = useState(null); // State to track which season is expanded
-  const [seasonsData, setSeasonsData] = useState([]); // State to hold seasons data
-  const [isLoading, setIsLoading] = useState(true); // Loading state for fetching seasons data
-  const [error, setError] = useState(null); // Error state for handling fetch errors
 
   // Effect to fetch seasons data when the podcast prop changes
   useEffect(() => {
@@ -85,8 +88,8 @@ const FullScreenModal = ({ podcast, isOpen, onClose, audioSrc, isPlaying, curren
               Last updated: <span>{podcast.updated}</span>
             </p>
             <div className="seasons-count">
-              {podcast.seasons > 0 
-                ? `${podcast.seasons} season${podcast.seasons !== 1 ? 's' : ''}` 
+              {podcast.seasons > 0
+                ? `${podcast.seasons} season${podcast.seasons !== 1 ? 's' : ''}`
                 : "No seasons available"}
             </div>
             <p className="description">{podcast.description}</p>
@@ -108,8 +111,8 @@ const FullScreenModal = ({ podcast, isOpen, onClose, audioSrc, isPlaying, curren
             <div className="seasons-list">
               {seasonsData.map((season) => (
                 <div key={season.season} className="season-item">
-                  <div 
-                    className="season-header" 
+                  <div
+                    className="season-header"
                     onClick={() => setExpandedSeason(expandedSeason === season.season ? null : season.season)}
                     aria-expanded={expandedSeason === season.season}
                   >
@@ -118,23 +121,40 @@ const FullScreenModal = ({ podcast, isOpen, onClose, audioSrc, isPlaying, curren
                       {season.episodes.length} episode{season.episodes.length !== 1 ? 's' : ''}
                     </span>
                   </div>
-                  
+
                   {expandedSeason === season.season && (
                     <div className="season-episodes">
-                      {season.episodes.map((episode) => (
-                        <div key={episode.episode} className="episode-item">
-                          <img src={season.image} alt={`Cover image for ${season.title}`} className="episode-season-image" />
-                          <div className="episode-details">
-                            <span className="episode-number">Episode {episode.episode}</span>
-                            <span className="episode-title">{episode.title}</span>
-                            <p className="episode-description">{episode.description || "No description available."}</p>
-                            <audio controls>
-                              <source src={episode.file} type="audio/mpeg" />
-                              Your browser does not support the audio element.
-                            </audio>
+                      {season.episodes.map((episode) => {
+                        const isFavorited = favorites.some(fav => fav.id === episode.id);
+                        return (
+                          <div key={episode.episode} className="episode-item">
+                            <img src={season.image} alt={`Cover image for ${season.title}`} className="episode-season-image" />
+                            <div className="episode-info">
+                              <span className="episode-number">Episode {episode.episode}</span>
+                              <div className="episode-header">
+                                <h4>{episode.title}</h4>
+                                <button
+                                  onClick={() => toggleFavorite(episode, podcast.title, season.title)}
+                                  className="favorite-btn"
+                                  aria-label={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
+                                >
+                                  <img
+                                    src={isFavorited ? heartFilled : heartOutline}
+                                    alt={isFavorited ? 'Favorited' : 'Not favorited'}
+                                  />
+                                </button>
+                              </div>
+                              <p className="episode-description">
+                                {episode.description || "No description available."}
+                              </p>
+                              <audio controls>
+                                <source src={episode.file} type="audio/mpeg" />
+                                Your browser does not support the audio element.
+                              </audio>
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
                 </div>
@@ -144,7 +164,7 @@ const FullScreenModal = ({ podcast, isOpen, onClose, audioSrc, isPlaying, curren
         </div>
 
         {/* Render the AudioPlayer component */}
-        <AudioPlayer 
+        <AudioPlayer
           audioSrc={audioSrc}
           isPlaying={isPlaying}
           onPlayPause={onPlayPause}
@@ -162,7 +182,10 @@ FullScreenModal.propTypes = {
     id: PropTypes.string,
     title: PropTypes.string,
     image: PropTypes.string,
-    description: PropTypes.string
+    description: PropTypes.string,
+    genres: PropTypes.array,
+    updated: PropTypes.string,
+    seasons: PropTypes.number
   }),
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
