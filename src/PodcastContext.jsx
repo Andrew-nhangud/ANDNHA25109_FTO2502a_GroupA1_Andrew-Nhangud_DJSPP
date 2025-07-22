@@ -1,23 +1,47 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
-// Create a context for the podcast data
 const PodcastContext = createContext();
 
-/**
- * PodcastProvider component that provides podcast-related state and functions
- * to its children via context.
- * 
- * @param {Object} props - Component props.
- * @param {React.ReactNode} props.children - Child components that will have access to the context.
- * @returns {JSX.Element} The rendered PodcastProvider component.
- */
 export const PodcastProvider = ({ children }) => {
-  // State variables for managing podcast-related data
-  const [searchTerm, setSearchTerm] = useState(''); // Search term for filtering podcasts
-  const [selectedGenre, setSelectedGenre] = useState(''); // Selected genre for filtering
-  const [sortOption, setSortOption] = useState(''); // Selected sort option for podcasts
-  const [currentPage, setCurrentPage] = useState(1); // Current page for pagination
-  const [podcastsPerPage] = useState(8); // Number of podcasts to display per page
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedGenre, setSelectedGenre] = useState('');
+  const [sortOption, setSortOption] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [podcastsPerPage] = useState(8);
+  const [favorites, setFavorites] = useState([]);
+
+  // Load favorites from localStorage on initial render
+  useEffect(() => {
+    const savedFavorites = localStorage.getItem('favorites');
+    if (savedFavorites) {
+      setFavorites(JSON.parse(savedFavorites));
+    }
+  }, []);
+
+  // Save favorites to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('favorites', JSON.stringify(favorites));
+  }, [favorites]);
+
+  const toggleFavorite = (episode, showTitle, seasonTitle) => {
+    setFavorites(prevFavorites => {
+      const isFavorited = prevFavorites.some(fav => fav.id === episode.id);
+
+      if (isFavorited) {
+        return prevFavorites.filter(fav => fav.id !== episode.id);
+      } else {
+        return [
+          ...prevFavorites,
+          {
+            ...episode,
+            showTitle,
+            seasonTitle,
+            dateAdded: new Date().toISOString()
+          }
+        ];
+      }
+    });
+  };
 
   return (
     <PodcastContext.Provider value={{
@@ -25,16 +49,14 @@ export const PodcastProvider = ({ children }) => {
       selectedGenre, setSelectedGenre,
       sortOption, setSortOption,
       currentPage, setCurrentPage,
-      podcastsPerPage
+      podcastsPerPage,
+      favorites,
+      toggleFavorite
     }}>
-      {children} {/* Render child components */}
+      {children}
     </PodcastContext.Provider>
   );
 };
 
-/**
- * Custom hook to use the PodcastContext.
- * 
- * @returns {Object} The context values.
- */
 export const usePodcastContext = () => useContext(PodcastContext);
+
