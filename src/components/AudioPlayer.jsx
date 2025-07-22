@@ -74,7 +74,7 @@ const AudioPlayer = ({ audioSrc, isPlaying, onPlayPause, onTimeUpdate, onDuratio
         ref={audioRef}
         src={audioSrc}
       />
-      <button onClick={onPlayPause}>
+      <button className="play-button" onClick={onPlayPause}>
         {isPlaying ? 'Pause' : 'Play'}
       </button>
       <input
