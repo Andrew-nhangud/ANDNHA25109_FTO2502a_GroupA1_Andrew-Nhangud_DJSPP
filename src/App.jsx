@@ -28,6 +28,7 @@ const App = () => {
   const [isPlaying, setIsPlaying] = useState(false); // State for audio playback
   const [currentTime, setCurrentTime] = useState(0); // State for current playback time
   const [duration, setDuration] = useState(0); // State for audio duration
+  const [favorites, setFavorites] = useState([]); // State for favorite episodes
 
   // Context values for search, genre, sort, pagination
   const {
@@ -170,6 +171,12 @@ const App = () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, [isPlaying]);
+
+  // Load favorites from localStorage on initial render
+  useEffect(() => {
+    const storedFavorites = JSON.parse(localStorage.getItem('favorites')) || [];
+    setFavorites(storedFavorites);
+  }, []);
 
   return (
     <div>
