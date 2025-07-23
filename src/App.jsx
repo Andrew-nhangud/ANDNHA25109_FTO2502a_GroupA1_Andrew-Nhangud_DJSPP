@@ -1,3 +1,4 @@
+// src/App.jsx
 import React, { useState, useEffect } from 'react';
 import { Route, Routes, useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -157,10 +158,8 @@ const App = () => {
       <Routes>
         <Route path="/" element={
           <>
-            <HeroSection />
-            <Filter
-              genres={genres}
-            />
+            <HeroSection podcasts={filteredPodcasts} />
+            <Filter genres={genres} />
 
             <section className="podcast-card container">
               {isLoading ? (
@@ -211,9 +210,7 @@ const App = () => {
         <Route path="/podcast/:id" element={
           <>
             <HeroSection />
-            <Filter
-              genres={genres}
-            />
+            <Filter genres={genres} />
             <section className="podcast-card container">
               {podcasts.filter(p => p.id === id).map(podcast => (
                 <PodcastCard
