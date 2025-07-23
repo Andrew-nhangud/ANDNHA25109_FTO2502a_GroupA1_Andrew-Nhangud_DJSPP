@@ -642,6 +642,70 @@ color:#777;
   height: 24px;
 }
 
+/* Carousel styles */
+.carousel-container {
+  display: flex;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.carousel-slides {
+  display: flex;
+  transition: transform 0.5s ease;
+  width: 100%;
+}
+
+.carousel-item {
+  min-width: 33.33%; /* Adjust based on itemsToShow */
+  box-sizing: border-box;
+  padding: 10px;
+  text-align: center;
+}
+
+.carousel-item img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.carousel-button {
+  background-color: transparent;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.prev {
+  position: absolute;
+  left: 10px;
+}
+
+.next {
+  position: absolute;
+  right: 10px;
+}
+
+/* Additional styles for the hero section */
+.hero-section {
+  padding: 20px;
+  text-align: center;
+}
+
+.podcast-genres {
+  margin-top: 5px;
+}
+
+.genre-tag {
+  display: inline-block;
+  background-color: #f0f0f0;
+  border-radius: 5px;
+  padding: 5px 10px;
+  margin: 2px;
+}
+
+
 
 /* Responsive styles */
 @media (max-width: 600px) {
