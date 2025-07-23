@@ -1,4 +1,3 @@
-// src/App.jsx
 import React, { useState, useEffect } from 'react';
 import { Route, Routes, useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -30,6 +29,7 @@ const App = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [isDarkMode, setIsDarkMode] = useState(false); // Dark mode state
 
   // Context values
   const {
@@ -151,9 +151,23 @@ const App = () => {
     setDuration(duration);
   };
 
+  // Dark mode toggle function
+  const toggleDarkMode = () => {
+    setIsDarkMode(prevMode => !prevMode);
+  };
+
+  // Effect to apply dark mode class to body
+  useEffect(() => {
+    if (isDarkMode) {
+      document.body.classList.add('dark-mode');
+    } else {
+      document.body.classList.remove('dark-mode');
+    }
+  }, [isDarkMode]);
+
   return (
     <div className="app-container">
-      <Header />
+      <Header toggleDarkMode={toggleDarkMode} isDarkMode={isDarkMode} />
 
       <Routes>
         <Route path="/" element={

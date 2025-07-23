@@ -5,7 +5,7 @@ import profilePictureIcon from '../assets/images/profile-picture-icon.png';
 import heartFilled from '../assets/images/heart-filled.png';
 import '../styles/styles.css';
 
-const Header = () => {
+const Header = ({ toggleDarkMode, isDarkMode }) => {
   return (
     <header className="header-container">
       <div className="innerHeader-container container">
@@ -20,6 +20,9 @@ const Header = () => {
             <img src={heartFilled} alt="Favorites" />
           </Link>
           <img src={profilePictureIcon} alt="profile" className="profile-icon" />
+          <button onClick={toggleDarkMode} className="dark-mode-toggle">
+            {isDarkMode ? 'Light Mode' : 'Dark Mode'}
+          </button>
         </div>
       </div>
     </header>
