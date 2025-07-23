@@ -1,27 +1,25 @@
-// src/components/Carousel.jsx
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-const Carousel = ({ podcasts = [] }) => { // Default to an empty array
+const Carousel = ({ podcasts = [] }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
-    const itemsToShow = 3; // Number of items to show at once
+    const itemsToShow = window.innerWidth < 768 ? 1 : 3; // Show 1 item on small screens, 3 on larger screens
+
+    const totalItems = Math.min(podcasts.length, 6); // Limit to 6 items
 
     const nextSlide = () => {
-        setCurrentIndex((prevIndex) => (prevIndex + 1) % Math.ceil(podcasts.length / itemsToShow));
+        setCurrentIndex((prevIndex) => (prevIndex + 1) % totalItems);
     };
 
     const prevSlide = () => {
-        setCurrentIndex((prevIndex) => (prevIndex - 1 + Math.ceil(podcasts.length / itemsToShow)) % Math.ceil(podcasts.length / itemsToShow));
+        setCurrentIndex((prevIndex) => (prevIndex - 1 + totalItems) % totalItems);
     };
-
-    // Debugging: Log the podcasts prop
-    console.log("Podcasts in Carousel:", podcasts);
 
     return (
         <div className="carousel-container">
             <button className="carousel-button prev" onClick={prevSlide}>❮</button>
-            <div className="carousel-slides">
-                {podcasts.slice(currentIndex * itemsToShow, currentIndex * itemsToShow + itemsToShow).map((podcast) => (
+            <div className="carousel-slides" style={{ transform: `translateX(-${(currentIndex * (100 / itemsToShow))}%)` }}>
+                {podcasts.slice(0, 6).map((podcast) => ( // Show only the first 6 podcasts
                     <div key={podcast.id} className="carousel-item">
                         <Link to={`/podcast/${podcast.id}`}>
                             <img src={podcast.image} alt={`Cover art for ${podcast.title}`} />

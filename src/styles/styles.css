@@ -643,23 +643,24 @@ a{
 
 /* Carousel styles */
 .carousel-container {
-  display: flex;
-  align-items: center;
-  position: relative;
-  overflow: hidden;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
 }
 
 .carousel-slides {
-  display: flex;
-  transition: transform 0.5s ease;
-  width: 100%;
+    display: flex;
+    transition: transform 0.5s ease;
+    width: 100%;
 }
 
 .carousel-item {
-  min-width: 33.33%; /* Adjust based on itemsToShow */
-  box-sizing: border-box;
-  padding: 10px;
-  text-align: center;
+    min-width: calc(100% / 3);
+    box-sizing: border-box;
+    padding: 10px;
+    text-align: center;
+    min-width: 100%;
 }
 
 .carousel-item img {
@@ -698,7 +699,8 @@ a{
 
 .genre-tag {
   display: inline-block;
-  background-color: #f0f0f0;
+  background-color: var(--secondary-color);
+  color: var(--accent-color);
   border-radius: 5px;
   padding: 5px 10px;
   margin: 2px;
@@ -784,6 +786,12 @@ a{
     .episode-season-image {
         width: 200px;
         height: auto;
+    }
+    .carousel-slides {
+        width: 75%;
+    }
+    .carousel-item {
+        min-width: 50%; 
     }
 }
 
