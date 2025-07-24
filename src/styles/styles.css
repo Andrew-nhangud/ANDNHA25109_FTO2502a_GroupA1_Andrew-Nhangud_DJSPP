@@ -95,6 +95,8 @@ a{
 .hero-section{
     display: flex;
     flex-direction: column;
+    padding: 20px;
+    text-align: center;
     margin-top: 30px;
     gap: 8px;
 }
@@ -106,6 +108,17 @@ a{
     font-size: 16px;
     line-height: 27px;
     color: var(--third-color);
+}
+.podcast-genres {
+  margin-top: 5px;
+}
+.genre-tag {
+  display: inline-block;
+  background-color: var(--secondary-color);
+  color: var(--accent-color);
+  border-radius: 5px;
+  padding: 5px 10px;
+  margin: 2px;
 }
 
 /* styles for the filter/search bar */
@@ -308,6 +321,8 @@ a{
     padding: 15px 0;
     border-bottom: 1px solid var(--secondary-color);
 }
+.audio-player,
+.play-episode-btn,
 .back-btn {
     background: none;
     border: none;
@@ -506,7 +521,7 @@ a{
     flex-grow: 1; /* Allow details to take remaining space */
 }
 
-/*  */
+/* audio player styles */
 .audio-player {
     position: fixed; /* Keep it at the bottom */
     bottom: 0;
@@ -520,24 +535,16 @@ a{
     align-items: center; 
     justify-content: space-between; 
 }
-.audio-player button {
-    margin: 10px;
-}
 .audio-player input[type="range"] {
     width: 50%;
     margin: 10px 0;
 }
 .audio-player button {
-    margin-right: 10px; /* Space between button and seek bar */
-    background-color: var(--secondary-color);
-    color: var(--primary-color);
+    margin: 10px;
     padding: 10px 20px;
     border: none;
     border-radius: 5px;
-    margin-top: 20px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.2s ease;
+    
 }
 
 .audio-player input[type="range"] {
@@ -627,18 +634,12 @@ a{
   margin-bottom: 10px;
 }
 
-.episode-description {
-  font-size: 14px;
-  line-height: 1.5;
-  margin: 10px 0;
-}
-
 /* Favorite button styles */
 .favorite-btn {
   background: none;
   border: none;
   cursor: pointer;
-  padding: 5px;
+  padding: 0px;
 }
 
 .favorite-btn img {
@@ -698,24 +699,6 @@ a{
   right: 10px;
 }
 
-/* Additional styles for the hero section */
-.hero-section {
-  padding: 20px;
-  text-align: center;
-}
-
-.podcast-genres {
-  margin-top: 5px;
-}
-
-.genre-tag {
-  display: inline-block;
-  background-color: var(--secondary-color);
-  color: var(--accent-color);
-  border-radius: 5px;
-  padding: 5px 10px;
-  margin: 2px;
-}
 
 
 

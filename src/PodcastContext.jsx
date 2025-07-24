@@ -8,7 +8,15 @@ export const PodcastProvider = ({ children }) => {
   const [sortOption, setSortOption] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [podcastsPerPage] = useState(8);
-  const [favorites, setFavorites] = useState([]);
+  const [favorites, setFavorites] = useState(() => {
+    const savedFavorites = localStorage.getItem('favorites');
+    if (savedFavorites) {
+      return JSON.parse(savedFavorites);
+    } else {
+      localStorage.setItem('favorites', JSON.stringify(defaultFavorites));
+      return defaultFavorites;
+    }
+  });
 
   // Load favorites from localStorage on initial render
   useEffect(() => {
