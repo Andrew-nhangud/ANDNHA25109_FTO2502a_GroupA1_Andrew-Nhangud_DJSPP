@@ -23,19 +23,19 @@ export const PodcastProvider = ({ children }) => {
     localStorage.setItem('favorites', JSON.stringify(favorites));
   }, [favorites]);
 
-  const toggleFavorite = (episode, showTitle, seasonTitle) => {
+  const toggleFavorite = (episode) => {
     setFavorites(prevFavorites => {
-      const isFavorited = prevFavorites.some(fav => fav.id === episode.id);
+      const isFavorited = prevFavorites.some(fav => fav.podcastId === episode.podcastId && fav.seasonNumber === episode.seasonNumber && fav.episodeNumber === episode.episodeNumber);
 
       if (isFavorited) {
-        return prevFavorites.filter(fav => fav.id !== episode.id);
+        return prevFavorites.filter(fav => !(fav.podcastId === episode.podcastId && fav.seasonNumber === episode.seasonNumber && fav.episodeNumber === episode.episodeNumber));
       } else {
         return [
           ...prevFavorites,
           {
             ...episode,
-            showTitle,
-            seasonTitle,
+            showTitle: episode.showTitle,
+            seasonTitle: episode.seasonTitle,
             dateAdded: new Date().toISOString()
           }
         ];
