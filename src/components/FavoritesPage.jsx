@@ -2,6 +2,31 @@ import React, { useState } from 'react';
 import { usePodcastContext } from '../PodcastContext';
 import { Link } from 'react-router-dom';
 
+// Custom hook to access global audio state from App via window
+function useGlobalAudio() {
+    const [_, setForce] = useState(0);
+    const [audioState, setAudioState] = useState(() => {
+        return {
+            setAudioSrc: window.setGlobalAudioSrc,
+            play: window.setGlobalAudioPlay,
+            pause: window.setGlobalAudioPause,
+            setCurrentTime: window.setGlobalAudioCurrentTime,
+        };
+    });
+    React.useEffect(() => {
+        // Listen for global audio state changes if needed
+        setAudioState({
+            setAudioSrc: window.setGlobalAudioSrc,
+            play: window.setGlobalAudioPlay,
+            pause: window.setGlobalAudioPause,
+            setCurrentTime: window.setGlobalAudioCurrentTime,
+        });
+        // Force re-render if global functions change
+        setForce(f => f + 1);
+    }, []);
+    return audioState;
+}
+
 const FavoritesPage = () => {
     const { favorites } = usePodcastContext();
     const [sortBy, setSortBy] = useState('date-newest');
@@ -24,6 +49,16 @@ const FavoritesPage = () => {
         acc[episode.showTitle][episode.seasonTitle].push(episode);
         return acc;
     }, {});
+
+    // Access global audio controls
+    const { setAudioSrc, play, setCurrentTime } = useGlobalAudio();
+
+    // Helper to play episode in global audio player
+    const handlePlayEpisode = (episode) => {
+        if (setAudioSrc) setAudioSrc(episode.file);
+        if (setCurrentTime) setCurrentTime(0);
+        if (play) play();
+    };
 
     return (
         <div className="favorites-page container">
@@ -68,10 +103,12 @@ const FavoritesPage = () => {
                                                         <p className="episode-description">{episode.description}</p>
                                                     )}
                                                 </div>
-                                                <audio controls>
-                                                    <source src={episode.file} type="audio/mpeg" />
-                                                    Your browser does not support the audio element.
-                                                </audio>
+                                                <button
+                                                    className="play-episode-btn"
+                                                    onClick={() => handlePlayEpisode(episode)}
+                                                >
+                                                    ▶ Play
+                                                </button>
                                             </div>
                                         ))}
                                     </div>
