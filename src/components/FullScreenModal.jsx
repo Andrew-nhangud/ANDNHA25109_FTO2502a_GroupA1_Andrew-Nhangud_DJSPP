@@ -125,7 +125,11 @@ const FullScreenModal = ({ podcast, isOpen, onClose, audioSrc, isPlaying, curren
                   {expandedSeason === season.season && (
                     <div className="season-episodes">
                       {season.episodes.map((episode) => {
-                        const isFavorited = favorites.some(fav => fav.id === episode.id);
+                        const isFavorited = favorites.some(fav =>
+                          fav.podcastId === podcast.id &&
+                          fav.seasonNumber === season.season &&
+                          fav.episodeNumber === episode.episode
+                        );
                         return (
                           <div key={episode.episode} className="episode-item">
                             <img src={season.image} alt={`Cover image for ${season.title}`} className="episode-season-image" />
@@ -134,7 +138,14 @@ const FullScreenModal = ({ podcast, isOpen, onClose, audioSrc, isPlaying, curren
                               <div className="episode-header">
                                 <h4>{episode.title}</h4>
                                 <button
-                                  onClick={() => toggleFavorite(episode, podcast.title, season.title)}
+                                  onClick={() => toggleFavorite({
+                                    ...episode,
+                                    podcastId: podcast.id,
+                                    showTitle: podcast.title,
+                                    seasonTitle: season.title,
+                                    seasonNumber: season.season,
+                                    episodeNumber: episode.episode
+                                  })}
                                   className="favorite-btn"
                                   aria-label={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
                                 >
