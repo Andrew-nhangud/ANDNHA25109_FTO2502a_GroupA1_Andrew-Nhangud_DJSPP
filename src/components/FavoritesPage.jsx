@@ -62,7 +62,7 @@ const FavoritesPage = () => {
                                     <h3>{seasonTitle}</h3>
                                     <div className="episodes-list">
                                         {episodes.map((episode) => (
-                                            <div key={episode.id} className="favorite-episode">
+                                            <div key={`id${episode.podcastId}-season${episode.seasonNumber}-episode${episode.episodeNumber}`} className="favorite-episode">
                                                 <div className="episode-info">
                                                     <h4>{episode.title}</h4>
                                                     <p className="date-added">
