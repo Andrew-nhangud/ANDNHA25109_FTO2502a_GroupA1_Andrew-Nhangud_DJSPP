@@ -1,4 +1,8 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
+
+// Fix: define defaultFavorites
+const defaultFavorites = [];
 
 const PodcastContext = createContext();
 
