@@ -15,14 +15,17 @@ const Header = ({ toggleDarkMode, isDarkMode }) => {
             <h1>Podcast<span>Hub</span></h1>
           </Link>
         </div>
-        <div className="leftSide-icons">
-          <Link to="/favorites" className="favorites-link">
-            <img src={heartFilled} alt="Favorites" />
-          </Link>
-          <img src={profilePictureIcon} alt="profile" className="profile-icon" />
+        <div className="navbar">
           <button onClick={toggleDarkMode} className="dark-mode-toggle">
             {isDarkMode ? 'Light Mode' : 'Dark Mode'}
           </button>
+          <Link to="/favorites" className="favorites-link">
+            {/* <img src={heartFilled} alt="Favorites" /> */}
+            <p>Favorites</p>
+          </Link>
+        </div>
+        <div className="leftSide-icons">
+          <img src={profilePictureIcon} alt="profile" className="profile-icon" />
         </div>
       </div>
     </header>
