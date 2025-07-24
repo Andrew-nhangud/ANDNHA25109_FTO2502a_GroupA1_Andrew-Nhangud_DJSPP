@@ -21,6 +21,7 @@ const App = () => {
   const [filteredPodcasts, setFilteredPodcasts] = useState([]);
   const [displayedPodcasts, setDisplayedPodcasts] = useState([]);
   const [selectedPodcast, setSelectedPodcast] = useState(null);
+  const [isPodcastModalOpen, setIsPodcastModalOpen] = useState(false);
   const [isFullScreenModalOpen, setIsFullScreenModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -168,13 +169,19 @@ const App = () => {
   return (
     <div className="app-container">
       <Header toggleDarkMode={toggleDarkMode} isDarkMode={isDarkMode} />
-
       <Routes>
         <Route path="/" element={
           <>
-            <HeroSection podcasts={filteredPodcasts} />
+            <HeroSection
+              podcasts={filteredPodcasts}
+              onSelect={(podcast) => {
+                setSelectedPodcast(podcast);
+                setIsPodcastModalOpen(true);
+              }}
+              setPodcastModalOpen={setIsPodcastModalOpen}
+              setFullScreenModalOpen={setIsFullScreenModalOpen}
+            />
             <Filter genres={genres} />
-
             <section className="podcast-card container">
               {isLoading ? (
                 <div className="loading-container">
@@ -209,13 +216,12 @@ const App = () => {
                 </>
               )}
             </section>
-
             <div className="pagination-container">
               <Pagination
                 podcastsPerPage={podcastsPerPage}
                 totalPodcasts={filteredPodcasts.length}
                 currentPage={currentPage}
-                paginate={paginate} // Pass the paginate function here
+                paginate={paginate}
               />
             </div>
           </>
@@ -240,21 +246,24 @@ const App = () => {
           </>
         } />
       </Routes>
-
       <PodcastModal
         podcast={selectedPodcast}
         onClose={() => {
+          setIsPodcastModalOpen(false);
           setSelectedPodcast(null);
           navigate('/');
         }}
-        onViewMore={() => setIsFullScreenModalOpen(true)}
+        onViewMore={() => {
+          setIsPodcastModalOpen(false);
+          setIsFullScreenModalOpen(true);
+        }}
       />
-
       <FullScreenModal
         podcast={selectedPodcast}
         isOpen={isFullScreenModalOpen}
         onClose={() => {
           setIsFullScreenModalOpen(false);
+          setSelectedPodcast(null);
           navigate('/');
         }}
         audioSrc={audioSrc}
@@ -265,7 +274,6 @@ const App = () => {
         onTimeUpdate={handleTimeUpdate}
         onDurationChange={handleDurationChange}
       />
-
       <AudioPlayer
         audioSrc={audioSrc}
         isPlaying={isPlaying}
