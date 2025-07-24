@@ -158,10 +158,24 @@ const FullScreenModal = ({ podcast, isOpen, onClose, audioSrc, isPlaying, curren
                               <p className="episode-description">
                                 {episode.description || "No description available."}
                               </p>
-                              <audio controls>
-                                <source src={episode.file} type="audio/mpeg" />
-                                Your browser does not support the audio element.
-                              </audio>
+                              {/* Play button for global audio */}
+                              <button
+                                className="play-episode-btn"
+                                style={{ marginLeft: 8 }}
+                                onClick={() => {
+                                  if (episode.file) {
+                                    onPlayPause(); // ensure play state is toggled
+                                    onTimeUpdate(0); // reset time
+                                    onDurationChange(0); // reset duration
+                                    // set audioSrc globally
+                                    if (typeof window !== 'undefined' && window.setGlobalAudioSrc) {
+                                      window.setGlobalAudioSrc(episode.file);
+                                    }
+                                  }
+                                }}
+                              >
+                                ▶ Play
+                              </button>
                             </div>
                           </div>
                         );
