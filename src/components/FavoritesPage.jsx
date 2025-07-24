@@ -6,8 +6,17 @@ const FavoritesPage = () => {
     const { favorites } = usePodcastContext();
     const [sortBy, setSortBy] = useState('date-newest');
 
-    // Group favorites by show → season → episodes
-    const groupedFavorites = favorites.reduce((acc, episode) => {
+    // Sort favorites before grouping
+    const sortedFavorites = [...favorites].sort((a, b) => {
+        if (sortBy === 'title-asc') return a.title.localeCompare(b.title);
+        if (sortBy === 'title-desc') return b.title.localeCompare(a.title);
+        if (sortBy === 'date-newest') return new Date(b.dateAdded) - new Date(a.dateAdded);
+        if (sortBy === 'date-oldest') return new Date(a.dateAdded) - new Date(b.dateAdded);
+        return 0;
+    });
+
+    // Group sorted favorites by show → season → episodes
+    const groupedFavorites = sortedFavorites.reduce((acc, episode) => {
         if (!acc[episode.showTitle]) acc[episode.showTitle] = {};
         if (!acc[episode.showTitle][episode.seasonTitle]) {
             acc[episode.showTitle][episode.seasonTitle] = [];
@@ -15,19 +24,6 @@ const FavoritesPage = () => {
         acc[episode.showTitle][episode.seasonTitle].push(episode);
         return acc;
     }, {});
-
-    // Sort episodes within each group
-    Object.keys(groupedFavorites).forEach((show) => {
-        Object.keys(groupedFavorites[show]).forEach((season) => {
-            groupedFavorites[show][season].sort((a, b) => {
-                if (sortBy === 'title-asc') return a.title.localeCompare(b.title);
-                if (sortBy === 'title-desc') return b.title.localeCompare(a.title);
-                if (sortBy === 'date-newest') return new Date(b.dateAdded) - new Date(a.dateAdded);
-                if (sortBy === 'date-oldest') return new Date(a.dateAdded) - new Date(b.dateAdded);
-                return 0;
-            });
-        });
-    });
 
     return (
         <div className="favorites-page container">
