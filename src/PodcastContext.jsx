@@ -14,12 +14,7 @@ export const PodcastProvider = ({ children }) => {
   const [podcastsPerPage] = useState(8);
   const [favorites, setFavorites] = useState(() => {
     const savedFavorites = localStorage.getItem('favorites');
-    if (savedFavorites) {
-      return JSON.parse(savedFavorites);
-    } else {
-      localStorage.setItem('favorites', JSON.stringify(defaultFavorites));
-      return defaultFavorites;
-    }
+    return savedFavorites ? JSON.parse(savedFavorites) : [];
   });
 
   // Load favorites from localStorage on initial render
