@@ -26,11 +26,30 @@ const App = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [noResultsMessage, setNoResultsMessage] = useState('');
-  const [audioSrc, setAudioSrc] = useState('https://podcast-api.netlify.app/placeholder-audio.mp3');
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [isDarkMode, setIsDarkMode] = useState(false); // Dark mode state
+  const [audioSrc, setAudioSrc] = useState(() => localStorage.getItem('audioSrc') || 'https://podcast-api.netlify.app/placeholder-audio.mp3');
+  const [isPlaying, setIsPlaying] = useState(() => JSON.parse(localStorage.getItem('isPlaying') || 'false'));
+  const [currentTime, setCurrentTime] = useState(() => Number(localStorage.getItem('currentTime') || 0));
+  const [duration, setDuration] = useState(() => Number(localStorage.getItem('duration') || 0));
+  // Persist audio player state to localStorage
+  useEffect(() => {
+    localStorage.setItem('audioSrc', audioSrc);
+  }, [audioSrc]);
+
+  useEffect(() => {
+    localStorage.setItem('isPlaying', JSON.stringify(isPlaying));
+  }, [isPlaying]);
+
+  useEffect(() => {
+    localStorage.setItem('currentTime', currentTime);
+  }, [currentTime]);
+
+  useEffect(() => {
+    localStorage.setItem('duration', duration);
+  }, [duration]);
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    const stored = localStorage.getItem('isDarkMode');
+    return stored ? JSON.parse(stored) : false;
+  }); // Dark mode state
 
   // Context values
   const {
@@ -40,6 +59,11 @@ const App = () => {
     currentPage, setCurrentPage,
     podcastsPerPage
   } = usePodcastContext();
+
+  // Persist currentPage to localStorage
+  useEffect(() => {
+    localStorage.setItem('currentPage', currentPage);
+  }, [currentPage]);
 
   const navigate = useNavigate();
   const { id } = useParams();
@@ -154,7 +178,10 @@ const App = () => {
 
   // Dark mode toggle function
   const toggleDarkMode = () => {
-    setIsDarkMode(prevMode => !prevMode);
+    setIsDarkMode(prevMode => {
+      localStorage.setItem('isDarkMode', JSON.stringify(!prevMode));
+      return !prevMode;
+    });
   };
 
   // Effect to apply dark mode class to body
