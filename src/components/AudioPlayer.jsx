@@ -68,14 +68,23 @@ const AudioPlayer = ({ audioSrc, isPlaying, onPlayPause, onTimeUpdate, onDuratio
     audioRef.current.currentTime = seekTime; // Update audio current time
   };
 
+  // Format time as mm:ss
+  const formatTime = (secs) => {
+    if (!secs || isNaN(secs)) return '0:00';
+    const m = Math.floor(secs / 60);
+    const s = Math.floor(secs % 60);
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+  };
+
   return (
     <div className="audio-player">
       <audio
         ref={audioRef}
         src={audioSrc}
+        style={{ display: 'none' }}
       />
       <button className="play-button" onClick={onPlayPause}>
-        {isPlaying ? 'Pause' : 'Play'}
+        {isPlaying ? '⏸ Pause' : '▶ Play'}
       </button>
       <input
         type="range"
@@ -83,8 +92,11 @@ const AudioPlayer = ({ audioSrc, isPlaying, onPlayPause, onTimeUpdate, onDuratio
         max={audioRef.current?.duration || 0}
         value={currentTime}
         onChange={handleSeek}
+        step="0.1"
       />
-      <span>{Math.floor(currentTime)} / {Math.floor(audioRef.current?.duration || 0)} seconds</span>
+      <span>
+        {formatTime(currentTime)} / {formatTime(audioRef.current?.duration || 0)}
+      </span>
     </div>
   );
 };
