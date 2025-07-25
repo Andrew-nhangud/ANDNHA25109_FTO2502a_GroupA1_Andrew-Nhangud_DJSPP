@@ -15,7 +15,9 @@ import PropTypes from 'prop-types';
  * @returns {JSX.Element} The rendered AudioPlayer component.
  */
 
-const AudioPlayer = ({ isPlaying, onPlayPause, currentTime }) => {
+
+const AudioPlayer = ({ audioSrc, isPlaying, onPlayPause, currentTime, onTimeUpdate, onDurationChange, duration, episode }) => {
+  const audioRef = useRef(null);
   // Format time as mm:ss
   const formatTime = (secs) => {
     if (!secs || isNaN(secs)) return '0:00';
@@ -24,32 +26,92 @@ const AudioPlayer = ({ isPlaying, onPlayPause, currentTime }) => {
     return `${m}:${s < 10 ? '0' : ''}${s}`;
   };
 
+  // Play/pause effect
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (isPlaying) {
+      audio.play().catch(() => { });
+    } else {
+      audio.pause();
+    }
+  }, [isPlaying, audioSrc]);
+
+  // Seek to currentTime when episode/audioSrc or currentTime changes
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (audio && currentTime != null && Math.abs(audio.currentTime - currentTime) > 0.5) {
+      audio.currentTime = currentTime;
+    }
+  }, [audioSrc, episode, currentTime]);
+
+  // Handle time update
+  const handleTimeUpdate = (e) => {
+    if (onTimeUpdate) {
+      onTimeUpdate(e.target.currentTime);
+    }
+  };
+
+  // Handle duration change
+  const handleLoadedMetadata = (e) => {
+    if (onDurationChange) {
+      onDurationChange(e.target.duration);
+    }
+  };
+
+  // Handle manual seek
+  const handleSeek = (e) => {
+    const seekTime = Number(e.target.value);
+    if (audioRef.current) {
+      audioRef.current.currentTime = seekTime;
+    }
+    if (onTimeUpdate) {
+      onTimeUpdate(seekTime);
+    }
+  };
+
   return (
     <div className="audio-player">
-      <button className="play-button" onClick={onPlayPause}>
+      {audioSrc ? (
+        <audio
+          ref={audioRef}
+          src={audioSrc}
+          onTimeUpdate={handleTimeUpdate}
+          onLoadedMetadata={handleLoadedMetadata}
+          preload="auto"
+        />
+      ) : null}
+      <button className="play-button" onClick={onPlayPause} disabled={!audioSrc}>
         {isPlaying ? '⏸ Pause' : '▶ Play'}
       </button>
-      {/* Range and time display kept for style, but not functional */}
       <input
         type="range"
-        min="0"
-        max={100}
+        min={0}
+        max={duration || 0}
         value={currentTime}
-        onChange={() => { }}
+        onChange={handleSeek}
         step="0.1"
-        disabled
+        disabled={!audioSrc}
       />
       <span>
-        {formatTime(currentTime)} / 0:00
+        {formatTime(currentTime)} / {formatTime(duration)}
       </span>
+      {episode && (
+        <span className="audio-episode-title">{episode.episodeTitle}</span>
+      )}
     </div>
   );
 };
 
 AudioPlayer.propTypes = {
+  audioSrc: PropTypes.string,
   isPlaying: PropTypes.bool.isRequired,
   onPlayPause: PropTypes.func.isRequired,
   currentTime: PropTypes.number.isRequired,
+  onTimeUpdate: PropTypes.func,
+  onDurationChange: PropTypes.func,
+  duration: PropTypes.number,
+  episode: PropTypes.object,
 };
 
 export default AudioPlayer;

@@ -26,22 +26,51 @@ const App = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [noResultsMessage, setNoResultsMessage] = useState('');
+  // Global audio player state
   const [isPlaying, setIsPlaying] = useState(() => JSON.parse(localStorage.getItem('isPlaying') || 'false'));
-  const [currentTime, setCurrentTime] = useState(() => Number(localStorage.getItem('currentTime') || 0));
-  const [duration, setDuration] = useState(() => Number(localStorage.getItem('duration') || 0));
-  // Persist audio player state to localStorage
+  const [currentEpisode, setCurrentEpisode] = useState(() => {
+    const stored = localStorage.getItem('currentEpisode');
+    return stored ? JSON.parse(stored) : null;
+  });
+  // Restore currentTime and duration for last played episode
+  const [currentTime, setCurrentTime] = useState(() => {
+    const stored = localStorage.getItem('currentEpisode');
+    if (stored) {
+      const ep = JSON.parse(stored);
+      const progress = localStorage.getItem(`progress_${ep.podcastId}_${ep.seasonNumber}_${ep.episodeNumber}`);
+      return progress ? Number(progress) : 0;
+    }
+    return 0;
+  });
+  const [duration, setDuration] = useState(() => {
+    const stored = localStorage.getItem('duration');
+    return stored ? Number(stored) : 0;
+  });
 
+  // Persist global player state
   useEffect(() => {
     localStorage.setItem('isPlaying', JSON.stringify(isPlaying));
   }, [isPlaying]);
 
   useEffect(() => {
-    localStorage.setItem('currentTime', currentTime);
-  }, [currentTime]);
+    // Save progress per episode
+    if (currentEpisode) {
+      localStorage.setItem(
+        `progress_${currentEpisode.podcastId}_${currentEpisode.seasonNumber}_${currentEpisode.episodeNumber}`,
+        currentTime
+      );
+    }
+  }, [currentTime, currentEpisode]);
 
   useEffect(() => {
     localStorage.setItem('duration', duration);
   }, [duration]);
+
+  useEffect(() => {
+    if (currentEpisode) {
+      localStorage.setItem('currentEpisode', JSON.stringify(currentEpisode));
+    }
+  }, [currentEpisode]);
   const [isDarkMode, setIsDarkMode] = useState(() => {
     const stored = localStorage.getItem('isDarkMode');
     return stored ? JSON.parse(stored) : false;
@@ -172,6 +201,17 @@ const App = () => {
     setDuration(duration);
   };
 
+  // Handle play episode from FullScreenModal
+  const handlePlayEpisode = (episodeInfo) => {
+    setCurrentEpisode(episodeInfo);
+    // Load progress for this episode
+    const progress = localStorage.getItem(
+      `progress_${episodeInfo.podcastId}_${episodeInfo.seasonNumber}_${episodeInfo.episodeNumber}`
+    );
+    setCurrentTime(progress ? Number(progress) : 0);
+    setIsPlaying(true);
+  };
+
   // Dark mode toggle function
   const toggleDarkMode = () => {
     setIsDarkMode(prevMode => {
@@ -289,18 +329,23 @@ const App = () => {
           setSelectedPodcast(null);
           navigate('/');
         }}
-        // audioSrc removed
         isPlaying={isPlaying}
         currentTime={currentTime}
         duration={duration}
         onPlayPause={handlePlayPause}
         onTimeUpdate={handleTimeUpdate}
         onDurationChange={handleDurationChange}
+        onPlayEpisode={handlePlayEpisode}
       />
       <AudioPlayer
         isPlaying={isPlaying}
         onPlayPause={handlePlayPause}
         currentTime={currentTime}
+        audioSrc={currentEpisode ? currentEpisode.audioUrl : null}
+        episode={currentEpisode}
+        duration={duration}
+        onTimeUpdate={handleTimeUpdate}
+        onDurationChange={handleDurationChange}
       />
     </div>
   );

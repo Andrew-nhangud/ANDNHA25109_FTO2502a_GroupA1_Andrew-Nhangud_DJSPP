@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import { usePodcastContext } from '../PodcastContext';
 import { Link } from 'react-router-dom';
 
@@ -26,7 +27,34 @@ const FavoritesPage = () => {
         return acc;
     }, {});
 
-    // Play logic removed; button kept for global player styling
+
+    // Global player state (to be lifted to App or context in next steps)
+    const [playingEpisode, setPlayingEpisode] = useState(null);
+    const [audioSrc, setAudioSrc] = useState('');
+    const [isLoadingAudio, setIsLoadingAudio] = useState(false);
+
+    // Handler to play an episode
+    const handlePlayEpisode = async (episode) => {
+        setIsLoadingAudio(true);
+        try {
+            // Fetch the podcast details to get the audio file for the episode
+            const response = await axios.get(`https://podcast-api.netlify.app/id/${episode.podcastId}`);
+            const season = response.data.seasons.find(s => s.season === episode.seasonNumber);
+            const ep = season ? season.episodes.find(e => e.episode === episode.episodeNumber) : null;
+            if (ep && ep.file) {
+                setAudioSrc(ep.file);
+                setPlayingEpisode({ ...episode, file: ep.file });
+                // Here you would also trigger the global player to play ep.file
+                // and update progress tracking
+            } else {
+                alert('Audio file not found for this episode.');
+            }
+        } catch (err) {
+            alert('Failed to fetch episode audio.');
+        } finally {
+            setIsLoadingAudio(false);
+        }
+    };
 
     return (
         <div className="favorites-page container">
@@ -73,9 +101,10 @@ const FavoritesPage = () => {
                                                 </div>
                                                 <button
                                                     className="play-episode-btn"
-                                                // Play logic removed; button kept for global player styling
+                                                    onClick={() => handlePlayEpisode(episode)}
+                                                    disabled={isLoadingAudio && playingEpisode && playingEpisode.podcastId === episode.podcastId && playingEpisode.seasonNumber === episode.seasonNumber && playingEpisode.episodeNumber === episode.episodeNumber}
                                                 >
-                                                    ▶ Play
+                                                    {isLoadingAudio && playingEpisode && playingEpisode.podcastId === episode.podcastId && playingEpisode.seasonNumber === episode.seasonNumber && playingEpisode.episodeNumber === episode.episodeNumber ? 'Loading...' : '▶ Play'}
                                                 </button>
                                             </div>
                                         ))}

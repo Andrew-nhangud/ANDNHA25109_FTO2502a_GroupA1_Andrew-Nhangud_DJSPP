@@ -25,7 +25,7 @@ import heartFilled from '../assets/images/heart-filled.png';
  * @param {function} props.onDurationChange - Function to handle duration updates.
  * @returns {JSX.Element|null} The rendered FullScreenModal component or null if closed.
  */
-const FullScreenModal = ({ podcast, isOpen, onClose, isPlaying, currentTime, onPlayPause }) => {
+const FullScreenModal = ({ podcast, isOpen, onClose, isPlaying, currentTime, duration, onPlayPause, onPlayEpisode, onTimeUpdate, onDurationChange }) => {
   const { favorites, toggleFavorite } = usePodcastContext();
   const [seasonsData, setSeasonsData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -130,6 +130,12 @@ const FullScreenModal = ({ podcast, isOpen, onClose, isPlaying, currentTime, onP
                           fav.seasonNumber === season.season &&
                           fav.episodeNumber === episode.episode
                         );
+                        // Mini progress bar logic
+                        const progressKey = `progress_${podcast.id}_${season.season}_${episode.episode}`;
+                        let savedProgress = 0;
+                        try {
+                          savedProgress = Number(localStorage.getItem(progressKey) || 0);
+                        } catch (e) { }
                         return (
                           <div key={episode.episode} className="episode-item">
                             <img src={season.image} alt={`Cover image for ${season.title}`} className="episode-season-image" />
@@ -158,11 +164,39 @@ const FullScreenModal = ({ podcast, isOpen, onClose, isPlaying, currentTime, onP
                               <p className="episode-description">
                                 {episode.description || "No description available."}
                               </p>
+                              {/* Mini progress bar for episode */}
+                              <div className="mini-progress-bar-container" style={{ margin: '8px 0' }}>
+                                <input
+                                  type="range"
+                                  min={0}
+                                  max={episode.duration || 1}
+                                  value={savedProgress}
+                                  step="0.1"
+                                  readOnly
+                                  style={{ width: '100%' }}
+                                />
+                                <span style={{ fontSize: '0.8em' }}>
+                                  {Math.floor(savedProgress / 60)}:{(Math.floor(savedProgress % 60)).toString().padStart(2, '0')}
+                                  {episode.duration ? ` / ${Math.floor((episode.duration || 0) / 60)}:${(Math.floor((episode.duration || 0) % 60)).toString().padStart(2, '0')}` : ''}
+                                </span>
+                              </div>
                               {/* Play button for global audio */}
                               <button
                                 className="play-episode-btn"
                                 style={{ marginLeft: 8 }}
-                              // Play logic removed; button kept for global player styling
+                                onClick={() => {
+                                  if (onPlayEpisode) {
+                                    onPlayEpisode({
+                                      podcastId: podcast.id,
+                                      seasonNumber: season.season,
+                                      episodeNumber: episode.episode,
+                                      audioUrl: episode.file, // assuming 'file' is the audio URL
+                                      episodeTitle: episode.title,
+                                      showTitle: podcast.title,
+                                      seasonTitle: season.title
+                                    });
+                                  }
+                                }}
                               >
                                 ▶ Play
                               </button>
@@ -184,6 +218,11 @@ const FullScreenModal = ({ podcast, isOpen, onClose, isPlaying, currentTime, onP
             isPlaying={isPlaying}
             onPlayPause={onPlayPause}
             currentTime={currentTime}
+            audioSrc={podcast && typeof window !== 'undefined' && window.localStorage.getItem('currentEpisode') ? JSON.parse(window.localStorage.getItem('currentEpisode')).audioUrl : null}
+            episode={podcast && typeof window !== 'undefined' && window.localStorage.getItem('currentEpisode') ? JSON.parse(window.localStorage.getItem('currentEpisode')) : null}
+            duration={duration}
+            onTimeUpdate={onTimeUpdate}
+            onDurationChange={onDurationChange}
           />
         </div>
       </div>
@@ -205,7 +244,11 @@ FullScreenModal.propTypes = {
   onClose: PropTypes.func.isRequired,
   isPlaying: PropTypes.bool.isRequired,
   currentTime: PropTypes.number.isRequired,
+  duration: PropTypes.number,
   onPlayPause: PropTypes.func.isRequired,
+  onPlayEpisode: PropTypes.func,
+  onTimeUpdate: PropTypes.func,
+  onDurationChange: PropTypes.func,
 };
 
 export default FullScreenModal;
