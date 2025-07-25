@@ -2,30 +2,6 @@ import React, { useState } from 'react';
 import { usePodcastContext } from '../PodcastContext';
 import { Link } from 'react-router-dom';
 
-// Custom hook to access global audio state from App via window
-function useGlobalAudio() {
-    const [_, setForce] = useState(0);
-    const [audioState, setAudioState] = useState(() => {
-        return {
-            setAudioSrc: window.setGlobalAudioSrc,
-            play: window.setGlobalAudioPlay,
-            pause: window.setGlobalAudioPause,
-            setCurrentTime: window.setGlobalAudioCurrentTime,
-        };
-    });
-    React.useEffect(() => {
-        // Listen for global audio state changes if needed
-        setAudioState({
-            setAudioSrc: window.setGlobalAudioSrc,
-            play: window.setGlobalAudioPlay,
-            pause: window.setGlobalAudioPause,
-            setCurrentTime: window.setGlobalAudioCurrentTime,
-        });
-        // Force re-render if global functions change
-        setForce(f => f + 1);
-    }, []);
-    return audioState;
-}
 
 const FavoritesPage = () => {
     const { favorites } = usePodcastContext();
@@ -50,15 +26,7 @@ const FavoritesPage = () => {
         return acc;
     }, {});
 
-    // Access global audio controls
-    const { setAudioSrc, play, setCurrentTime } = useGlobalAudio();
-
-    // Helper to play episode in global audio player
-    const handlePlayEpisode = (episode) => {
-        if (setAudioSrc) setAudioSrc(episode.file);
-        if (setCurrentTime) setCurrentTime(0);
-        if (play) play();
-    };
+    // Play logic removed; button kept for global player styling
 
     return (
         <div className="favorites-page container">
@@ -105,7 +73,7 @@ const FavoritesPage = () => {
                                                 </div>
                                                 <button
                                                     className="play-episode-btn"
-                                                    onClick={() => handlePlayEpisode(episode)}
+                                                    // Play logic removed; button kept for global player styling
                                                 >
                                                     ▶ Play
                                                 </button>

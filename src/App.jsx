@@ -26,14 +26,10 @@ const App = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [noResultsMessage, setNoResultsMessage] = useState('');
-  const [audioSrc, setAudioSrc] = useState(() => localStorage.getItem('audioSrc') || 'https://podcast-api.netlify.app/placeholder-audio.mp3');
   const [isPlaying, setIsPlaying] = useState(() => JSON.parse(localStorage.getItem('isPlaying') || 'false'));
   const [currentTime, setCurrentTime] = useState(() => Number(localStorage.getItem('currentTime') || 0));
   const [duration, setDuration] = useState(() => Number(localStorage.getItem('duration') || 0));
   // Persist audio player state to localStorage
-  useEffect(() => {
-    localStorage.setItem('audioSrc', audioSrc);
-  }, [audioSrc]);
 
   useEffect(() => {
     localStorage.setItem('isPlaying', JSON.stringify(isPlaying));
@@ -293,7 +289,7 @@ const App = () => {
           setSelectedPodcast(null);
           navigate('/');
         }}
-        audioSrc={audioSrc}
+        // audioSrc removed
         isPlaying={isPlaying}
         currentTime={currentTime}
         duration={duration}
@@ -302,11 +298,8 @@ const App = () => {
         onDurationChange={handleDurationChange}
       />
       <AudioPlayer
-        audioSrc={audioSrc}
         isPlaying={isPlaying}
         onPlayPause={handlePlayPause}
-        onTimeUpdate={handleTimeUpdate}
-        onDurationChange={handleDurationChange}
         currentTime={currentTime}
       />
     </div>

@@ -25,7 +25,7 @@ import heartFilled from '../assets/images/heart-filled.png';
  * @param {function} props.onDurationChange - Function to handle duration updates.
  * @returns {JSX.Element|null} The rendered FullScreenModal component or null if closed.
  */
-const FullScreenModal = ({ podcast, isOpen, onClose, audioSrc, isPlaying, currentTime, duration, onPlayPause, onTimeUpdate, onDurationChange }) => {
+const FullScreenModal = ({ podcast, isOpen, onClose, isPlaying, currentTime, onPlayPause }) => {
   const { favorites, toggleFavorite } = usePodcastContext();
   const [seasonsData, setSeasonsData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -162,17 +162,7 @@ const FullScreenModal = ({ podcast, isOpen, onClose, audioSrc, isPlaying, curren
                               <button
                                 className="play-episode-btn"
                                 style={{ marginLeft: 8 }}
-                                onClick={() => {
-                                  if (episode.file) {
-                                    onPlayPause(); // ensure play state is toggled
-                                    onTimeUpdate(0); // reset time
-                                    onDurationChange(0); // reset duration
-                                    // set audioSrc globally
-                                    if (typeof window !== 'undefined' && window.setGlobalAudioSrc) {
-                                      window.setGlobalAudioSrc(episode.file);
-                                    }
-                                  }
-                                }}
+                                // Play logic removed; button kept for global player styling
                               >
                                 ▶ Play
                               </button>
@@ -188,15 +178,14 @@ const FullScreenModal = ({ podcast, isOpen, onClose, audioSrc, isPlaying, curren
           )}
         </div>
 
-        {/* Render the AudioPlayer component */}
-        <AudioPlayer
-          audioSrc={audioSrc}
-          isPlaying={isPlaying}
-          onPlayPause={onPlayPause}
-          onTimeUpdate={onTimeUpdate}
-          onDurationChange={onDurationChange}
-          currentTime={currentTime} // Pass current time to AudioPlayer
-        />
+        {/* Show the global AudioPlayer at the bottom of the modal */}
+        <div style={{ position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 9999 }}>
+          <AudioPlayer
+            isPlaying={isPlaying}
+            onPlayPause={onPlayPause}
+            currentTime={currentTime}
+          />
+        </div>
       </div>
     </div>
   );
@@ -214,13 +203,9 @@ FullScreenModal.propTypes = {
   }),
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
-  audioSrc: PropTypes.string.isRequired,
   isPlaying: PropTypes.bool.isRequired,
   currentTime: PropTypes.number.isRequired,
-  duration: PropTypes.number.isRequired,
   onPlayPause: PropTypes.func.isRequired,
-  onTimeUpdate: PropTypes.func.isRequired,
-  onDurationChange: PropTypes.func.isRequired,
 };
 
 export default FullScreenModal;
