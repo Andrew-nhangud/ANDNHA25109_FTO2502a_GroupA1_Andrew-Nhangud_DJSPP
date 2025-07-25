@@ -2,14 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Route, Routes, useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Header from './components/Header';
-import HeroSection from './components/HeroSection';
-import Filter from './components/Filter';
-import PodcastCard from './components/PodcastCard';
 import PodcastModal from './components/PodcastModal';
 import FullScreenModal from './components/FullScreenModal';
-import Pagination from './components/Pagination';
 import AudioPlayer from './components/AudioPlayer';
-import FavoritesPage from './components/FavoritesPage';
+import AppRoutes from './components/AppRoutes';
 import { genres } from './data/data';
 import { formatDate } from './utils/utils';
 import { usePodcastContext } from './PodcastContext';
@@ -232,83 +228,22 @@ const App = () => {
   return (
     <div className="app-container">
       <Header toggleDarkMode={toggleDarkMode} isDarkMode={isDarkMode} />
-      <Routes>
-        <Route path="/" element={
-          <>
-            <HeroSection
-              podcasts={filteredPodcasts}
-              onSelect={(podcast) => {
-                setSelectedPodcast(podcast);
-                setIsPodcastModalOpen(true);
-              }}
-              setPodcastModalOpen={setIsPodcastModalOpen}
-              setFullScreenModalOpen={setIsFullScreenModalOpen}
-            />
-            <Filter genres={genres} />
-            <section className="podcast-card container">
-              {isLoading ? (
-                <div className="loading-container">
-                  <div className="loading-spinner"></div>
-                  <p>Loading podcasts...</p>
-                </div>
-              ) : error ? (
-                <div className="error-container">
-                  <p className="error-message">{error}</p>
-                  <button
-                    className="retry-button"
-                    onClick={() => window.location.reload()}
-                  >
-                    Retry
-                  </button>
-                </div>
-              ) : (
-                <>
-                  {noResultsMessage && (
-                    <p className="no-results-message">{noResultsMessage}</p>
-                  )}
-                  {displayedPodcasts.map((podcast) => (
-                    <PodcastCard
-                      key={podcast.id}
-                      podcast={podcast}
-                      onSelect={(selected) => {
-                        setSelectedPodcast(selected);
-                        navigate(`/podcast/${selected.id}`);
-                      }}
-                    />
-                  ))}
-                </>
-              )}
-            </section>
-            <div className="pagination-container">
-              <Pagination
-                podcastsPerPage={podcastsPerPage}
-                totalPodcasts={filteredPodcasts.length}
-                currentPage={currentPage}
-                paginate={paginate}
-              />
-            </div>
-          </>
-        } />
-        <Route path="/favorites" element={<FavoritesPage />} />
-        <Route path="/podcast/:id" element={
-          <>
-            <HeroSection />
-            <Filter genres={genres} />
-            <section className="podcast-card container">
-              {podcasts.filter(p => p.id === id).map(podcast => (
-                <PodcastCard
-                  key={podcast.id}
-                  podcast={podcast}
-                  onSelect={(selected) => {
-                    setSelectedPodcast(selected);
-                    navigate(`/podcast/${selected.id}`);
-                  }}
-                />
-              ))}
-            </section>
-          </>
-        } />
-      </Routes>
+      <AppRoutes
+        filteredPodcasts={filteredPodcasts}
+        displayedPodcasts={displayedPodcasts}
+        podcasts={podcasts}
+        isLoading={isLoading}
+        error={error}
+        noResultsMessage={noResultsMessage}
+        podcastsPerPage={podcastsPerPage}
+        currentPage={currentPage}
+        paginate={paginate}
+        setSelectedPodcast={setSelectedPodcast}
+        setIsPodcastModalOpen={setIsPodcastModalOpen}
+        setIsFullScreenModalOpen={setIsFullScreenModalOpen}
+        navigate={navigate}
+        id={id}
+      />
       <PodcastModal
         podcast={selectedPodcast}
         onClose={() => {
