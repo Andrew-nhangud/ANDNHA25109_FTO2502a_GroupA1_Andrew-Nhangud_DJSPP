@@ -73,7 +73,7 @@ const FavoritesPage = () => {
                                                 </div>
                                                 <button
                                                     className="play-episode-btn"
-                                                    // Play logic removed; button kept for global player styling
+                                                // Play logic removed; button kept for global player styling
                                                 >
                                                     ▶ Play
                                                 </button>

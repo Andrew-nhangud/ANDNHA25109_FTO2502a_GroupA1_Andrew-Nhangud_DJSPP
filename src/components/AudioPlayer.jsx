@@ -35,7 +35,7 @@ const AudioPlayer = ({ isPlaying, onPlayPause, currentTime }) => {
         min="0"
         max={100}
         value={currentTime}
-        onChange={() => {}}
+        onChange={() => { }}
         step="0.1"
         disabled
       />

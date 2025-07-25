@@ -162,7 +162,7 @@ const FullScreenModal = ({ podcast, isOpen, onClose, isPlaying, currentTime, onP
                               <button
                                 className="play-episode-btn"
                                 style={{ marginLeft: 8 }}
-                                // Play logic removed; button kept for global player styling
+                              // Play logic removed; button kept for global player styling
                               >
                                 ▶ Play
                               </button>
